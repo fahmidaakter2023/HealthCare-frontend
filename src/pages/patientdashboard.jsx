@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 
 function PatientDashboard() {
   const navigate = useNavigate();
 
-  // Static doctor database (frontend demo)
+  // 🔹 Doctor Database
   const doctors = [
     {
       name: "Dr. John Smith",
@@ -33,52 +33,58 @@ function PatientDashboard() {
     },
   ];
 
-  // State
+  // 🔹 State
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [appointmentDate, setAppointmentDate] = useState("");
-
   const [appointments, setAppointments] = useState([]);
-  const [prescriptions] = useState([
-    {
-      doctor: "Dr. John Smith",
-      medicine: "Paracetamol",
-      times: "2 times a day",
-      duration: "5 days",
-    },
-    {
-      doctor: "Dr. Lisa Ray",
-      medicine: "Antibiotic",
-      times: "1 time a day",
-      duration: "7 days",
-    },
-  ]);
+  const [message, setMessage] = useState("");
 
-  // Filter doctors
+  // 🔹 Load appointments from localStorage
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("appointments")) || [];
+    setAppointments(stored);
+  }, []);
+
+  // 🔹 Save appointments to localStorage
+  useEffect(() => {
+    localStorage.setItem("appointments", JSON.stringify(appointments));
+  }, [appointments]);
+
+  // 🔹 Filter doctors
   const filteredDoctors = doctors.filter(
     (d) => d.specialization === selectedSpecialization
   );
 
-  // Book appointment
+  // 🔹 Book appointment
   const handleBookAppointment = () => {
     if (!appointmentDate) {
-      alert("Please select a date");
+      setMessage("❌ Please select a date");
       return;
     }
 
     const newAppointment = {
+      id: Date.now(),
       doctor: selectedDoctor.name,
       email: selectedDoctor.email,
       date: appointmentDate,
+      status: "Pending",
     };
 
     setAppointments([...appointments, newAppointment]);
-    alert("Appointment booked successfully!");
+    setMessage("✅ Appointment booked successfully!");
 
     setSelectedDoctor(null);
     setAppointmentDate("");
   };
 
+  // 🔹 Cancel appointment
+  const handleCancel = (id) => {
+    const updated = appointments.filter((a) => a.id !== id);
+    setAppointments(updated);
+  };
+
+  // 🔹 Logout
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     navigate("/");
@@ -88,9 +94,12 @@ function PatientDashboard() {
     <div className="page-container">
       <div className="dashboard">
         <h2>Patient Dashboard</h2>
+
         <button onClick={handleLogout}>Logout</button>
 
-        {/* Search by Specialization */}
+        {message && <p>{message}</p>}
+
+        {/* 🔍 Search */}
         <h3>Search Doctor by Specialization</h3>
         <select
           value={selectedSpecialization}
@@ -103,7 +112,7 @@ function PatientDashboard() {
           <option value="Orthopedics">Orthopedics</option>
         </select>
 
-        {/* Doctor List */}
+        {/* 👨‍⚕️ Doctor List */}
         {selectedSpecialization && (
           <>
             <h3>Available Doctors</h3>
@@ -113,6 +122,7 @@ function PatientDashboard() {
                   <strong>{doc.name}</strong> <br />
                   {doc.qualification} <br />
                   Email: {doc.email} <br />
+
                   <button onClick={() => setSelectedDoctor(doc)}>
                     Book Appointment
                   </button>
@@ -122,41 +132,51 @@ function PatientDashboard() {
           </>
         )}
 
-        {/* Calendar */}
+        {/* 📅 Booking */}
         {selectedDoctor && (
           <>
             <h3>Book Appointment with {selectedDoctor.name}</h3>
+
             <input
               type="date"
               value={appointmentDate}
               onChange={(e) => setAppointmentDate(e.target.value)}
             />
+
             <br />
-            <button onClick={handleBookAppointment}>Confirm Appointment</button>
+            <button onClick={handleBookAppointment}>
+              Confirm Appointment
+            </button>
           </>
         )}
 
-        {/* Appointments */}
+        {/* 📋 Appointments */}
         <h3>My Appointments</h3>
-        <ul>
-          {appointments.map((a, idx) => (
-            <li key={idx}>
-              {a.date} — {a.doctor}
-            </li>
-          ))}
-        </ul>
+        {appointments.length === 0 ? (
+          <p>No appointments yet</p>
+        ) : (
+          <ul>
+            {appointments.map((a) => (
+              <li key={a.id}>
+                📅 {a.date} — {a.doctor} ({a.status})
+                <br />
+                <button onClick={() => handleCancel(a.id)}>
+                  Cancel
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
-        {/* Prescriptions */}
+        {/* 💊 Prescriptions (demo) */}
         <h3>My Prescriptions</h3>
         <ul>
-          {prescriptions.map((p, idx) => (
-            <li key={idx}>
-              <strong>{p.doctor}</strong><br />
-              Medicine: {p.medicine}<br />
-              Time: {p.times}<br />
-              Duration: {p.duration}
-            </li>
-          ))}
+          <li>
+            <strong>Dr. John Smith</strong><br />
+            Medicine: Paracetamol <br />
+            Time: 2 times/day <br />
+            Duration: 5 days
+          </li>
         </ul>
       </div>
     </div>

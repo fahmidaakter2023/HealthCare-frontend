@@ -16,6 +16,7 @@ export default function Home() {
         <Link to="/signup">
           <button style={{ margin: "10px" }}>Signup</button>
         </Link>
+         <Link to="/doctor-login"><button>Doctor Portal</button></Link>
        <Link to="/about">
           <button style={{ margin: "10px" }}>About Us</button>
         </Link>

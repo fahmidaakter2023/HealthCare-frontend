@@ -6,8 +6,10 @@ body {
 
 h1, h2 {
   color: #2c3e50;
+  text-align: center;
 }
 
+/* responsive */
 @media (max-width: 600px) {
   .dashboard {
     max-width: 95%;
