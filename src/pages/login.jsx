@@ -1,28 +1,40 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { patientLogin, doctorLogin, adminLogin } from "../services/api";
 import "../App.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("patient");
-  const [attempted, setAttempted] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setAttempted(true);
+    setError("");
+    setLoading(true);
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const user = users.find(
-      (u) => u.email === email && u.password === password && u.role === role
-    );
+    try {
+      let res;
+      if (role === "patient") res = await patientLogin(email, password);
+      else if (role === "doctor") res = await doctorLogin(email, password);
+      else res = await adminLogin(email, password);
 
-    if (!user) return;
-
-    if (role === "patient") navigate("/patient");
-    else if (role === "doctor") navigate("/doctor");
-    else if (role === "admin") navigate("/admin");
+      if (res.message === "Login successful") {
+        localStorage.setItem("currentUser", JSON.stringify({ ...res, role }));
+        if (role === "patient") navigate("/patient");
+        else if (role === "doctor") navigate("/doctor");
+        else navigate("/admin");
+      } else {
+        setError(res.error || "Invalid credentials");
+      }
+    } catch (err) {
+      setError("Server error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,8 +42,8 @@ function Login() {
       <div className="dashboard">
         <h2>Login</h2>
 
-        <label htmlFor="role">Select Role </label>
-        <select id="role" value={role} onChange={(e) => setRole(e.target.value)}>
+        <label>Select Role</label>
+        <select value={role} onChange={(e) => setRole(e.target.value)}>
           <option value="patient">Patient</option>
           <option value="doctor">Doctor</option>
           <option value="admin">Admin</option>
@@ -54,17 +66,11 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {attempted && !email && !password && (
-            <p style={{ color: "red" }}>Please enter email and password</p>
-          )}
-          {attempted &&
-            email &&
-            password &&
-            !JSON.parse(localStorage.getItem("users") || "[]").find(
-              (u) => u.email === email && u.password === password && u.role === role
-            ) && <p style={{ color: "red" }}>Invalid credentials or role</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
 
-          <button type="submit">Login</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
 
         <p className="login-instruction">

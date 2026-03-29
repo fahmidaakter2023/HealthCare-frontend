@@ -1,25 +1,29 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAllUsers, banUser } from "../services/api";
 import "../App.css";
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-    setUsers(storedUsers);
-  }, []);
+  useEffect(() => { loadUsers(); }, []);
+
+  const loadUsers = async () => {
+    try {
+      const data = await getAllUsers();
+      setUsers(Array.isArray(data) ? data : []);
+    } catch { alert("Could not load users."); }
+  };
+
+  const handleBan = async (id) => {
+    await banUser(id);
+    loadUsers();
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     navigate("/");
-  };
-
-  const banUser = (email) => {
-    const filtered = users.filter((u) => u.email !== email);
-    setUsers(filtered);
-    localStorage.setItem("users", JSON.stringify(filtered));
   };
 
   const patients = users.filter((u) => u.role === "patient");
@@ -33,24 +37,20 @@ function AdminDashboard() {
 
         <h3>Patients</h3>
         <ul>
-          {patients.map((p, idx) => (
-            <li key={idx}>
+          {patients.map((p) => (
+            <li key={p.id}>
               <strong>{p.email}</strong><br />
-              Appointments: {p.appointments?.length || 0}
-              <br />
-              <button onClick={() => banUser(p.email)}>Ban Patient</button>
+              <button onClick={() => handleBan(p.id)}>Ban Patient</button>
             </li>
           ))}
         </ul>
 
         <h3>Doctors</h3>
         <ul>
-          {doctors.map((d, idx) => (
-            <li key={idx}>
-              <strong>{d.email}</strong><br />
-              Specialization: {d.specialization || "General"}
-              <br />
-              <button onClick={() => banUser(d.email)}>Ban Doctor</button>
+          {doctors.map((d) => (
+            <li key={d.id}>
+              <strong>{d.email}</strong> — {d.specialization || "General"}<br />
+              <button onClick={() => handleBan(d.id)}>Ban Doctor</button>
             </li>
           ))}
         </ul>
