@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = 'https://healthcare-backend-production-863b.up.railway.app/api';
 
 export const patientRegister = (data) =>
   fetch(`${BASE_URL}/patient/register`, {
