@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -68,3 +69,48 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+=======
+# Healthcare Management System – Frontend
+
+Frontend repository for the Healthcare Web Application developed as part of  
+**CSE 616: Lab on Web Engineering**  
+University of Chittagong.
+
+## 👩‍💻 Team Member (Frontend)
+- **Humayra Adiba** – Frontend Developer
+
+## 📌 Project Overview
+This repository contains the **frontend** of a role-based Healthcare Management System.
+The system supports three types of users:
+- Patient
+- Doctor
+- Admin
+
+The frontend is developed using **React.js** and communicates with a Spring Boot backend
+through RESTful APIs.
+
+## ✨ Features Implemented
+- React project setup using Create React App
+- Role-based routing using React Router
+- Patient Dashboard UI
+- Doctor Dashboard UI
+- Admin Dashboard UI
+- Appointment booking interface
+- Prescription viewing interface
+- Reusable components and modular folder structure
+
+## 🛠️ Technology Stack
+- **React.js**
+- JavaScript (ES6)
+- HTML5
+- CSS3
+
+## 🔗 Backend Repository
+The backend of this project is developed separately using Spring Boot:  
+https://github.com/fahmidaakter2023/HealthCare-backend
+
+## ▶️ How to Run the Project
+```bash
+npm install
+npm start
+>>>>>>> 7d450e5c78c69ae42b620c4ed26b8e295fe3a45a
